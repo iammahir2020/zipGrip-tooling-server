@@ -16,6 +16,21 @@ const client = new MongoClient(uri, {
   serverApi: ServerApiVersion.v1,
 });
 
+const verifyJWTToken = (req, res, next) => {
+  const authorization = req.headers.authorization;
+  if (!authorization) {
+    return res.status(401).send([{ message: "Unauthorized Access" }]);
+  }
+  const token = authorization.split(" ")[1];
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(403).send([{ message: "Forbidden Access" }]);
+    }
+    req.decoded = decoded;
+    next();
+  });
+};
+
 async function run() {
   try {
     await client.connect();
@@ -24,6 +39,11 @@ async function run() {
     const reviewsCollection = client
       .db("zipGrip-tooling")
       .collection("reviews");
+
+    app.get("/user", async (req, res) => {
+      const users = await userCollection.find().toArray();
+      res.send(users);
+    });
 
     app.put("/user/:email", async (req, res) => {
       const email = req.params.email;
@@ -44,12 +64,39 @@ async function run() {
       res.send({ result, token });
     });
 
+    app.delete("/user/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const result = await userCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    app.put("/user/admin/:email", verifyJWTToken, async (req, res) => {
+      const email = req.params.email;
+      const filter = { email: email };
+      const updateDoc = {
+        $set: { position: "admin" },
+      };
+      const result = await userCollection.updateOne(filter, updateDoc);
+      res.send({ result });
+    });
+
+    app.get("/admin/:email", verifyJWTToken, async (req, res) => {
+      const email = req.params.email;
+      const user = await userCollection.findOne({ email: email });
+      if (user.position === "admin") {
+        res.send({ admin: true });
+      } else {
+        res.send({ admin: false });
+      }
+    });
+
     app.get("/review", async (req, res) => {
       const result = await reviewsCollection.find().sort({ _id: -1 }).toArray();
       res.send(result);
     });
 
-    app.post("/review", async (req, res) => {
+    app.post("/review", verifyJWTToken, async (req, res) => {
       const review = req.body;
       const result = await reviewsCollection.insertOne(review);
       res.send(result);
