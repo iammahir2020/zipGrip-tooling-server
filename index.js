@@ -21,6 +21,9 @@ async function run() {
     await client.connect();
 
     const userCollection = client.db("zipGrip-tooling").collection("users");
+    const reviewsCollection = client
+      .db("zipGrip-tooling")
+      .collection("reviews");
 
     app.put("/user/:email", async (req, res) => {
       const email = req.params.email;
@@ -39,6 +42,12 @@ async function run() {
         }
       );
       res.send({ result, token });
+    });
+
+    app.post("/review", async (req, res) => {
+      const review = req.body;
+      const result = await reviewsCollection.insertOne(review);
+      res.send(result);
     });
   } finally {
   }
