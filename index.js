@@ -116,6 +116,19 @@ async function run() {
       res.send({ result });
     });
 
+    app.put("/profilePicture/:email", verifyJWTToken, async (req, res) => {
+      const email = req.params.email;
+      const userProfile = req.body;
+      const filter = { email: email };
+      const updateDoc = {
+        $set: {
+          profilePicture: userProfile.profilePicture,
+        },
+      };
+      const result = await userCollection.updateOne(filter, updateDoc);
+      res.send({ result });
+    });
+
     app.get("/review", async (req, res) => {
       const result = await reviewsCollection.find().sort({ _id: -1 }).toArray();
       res.send(result);
