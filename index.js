@@ -91,6 +91,31 @@ async function run() {
       }
     });
 
+    app.get("/profile/:email", verifyJWTToken, async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const user = await userCollection.findOne(query);
+      res.send(user);
+    });
+
+    app.put("/profile/:email", verifyJWTToken, async (req, res) => {
+      const email = req.params.email;
+      const userProfile = req.body;
+      // console.log(userProfile);
+      const filter = { email: email };
+      const updateDoc = {
+        $set: {
+          name: userProfile.name,
+          institution: userProfile.institution,
+          address: userProfile.address,
+          number: userProfile.number,
+          linkedIn: userProfile.linkedIn,
+        },
+      };
+      const result = await userCollection.updateOne(filter, updateDoc);
+      res.send({ result });
+    });
+
     app.get("/review", async (req, res) => {
       const result = await reviewsCollection.find().sort({ _id: -1 }).toArray();
       res.send(result);
