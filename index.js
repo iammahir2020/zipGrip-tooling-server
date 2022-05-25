@@ -42,6 +42,7 @@ async function run() {
     const productsCollection = client
       .db("zipGrip-tooling")
       .collection("products");
+    const ordersCollection = client.db("zipGrip-tooling").collection("orders");
 
     app.get("/user", async (req, res) => {
       const users = await userCollection.find().toArray();
@@ -148,17 +149,50 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/product/singleProduct/:id", verifyJWTToken, async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const product = await productsCollection.findOne(query);
+      res.send(product);
+    });
+
+    app.get("/product/:page", async (req, res) => {
+      const page = req.params.page;
+      if (page === "home") {
+        const result = await productsCollection.find().limit(4).toArray();
+        res.send(result);
+      }
+    });
+
     app.post("/product", verifyJWTToken, async (req, res) => {
       const product = req.body;
       const result = await productsCollection.insertOne(product);
       res.send(result);
     });
 
+    app.put("/product/:id", verifyJWTToken, async (req, res) => {
+      const id = req.params.id;
+      const remainingQuantity = req.body;
+      const filter = { _id: ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          available: remainingQuantity.remainingQuantity,
+        },
+      };
+      const result = await productsCollection.updateOne(filter, updateDoc);
+      res.send({ result });
+    });
+
     app.delete("/product/:id", verifyJWTToken, async (req, res) => {
       const id = req.params.id;
-      console.log(id);
       const query = { _id: ObjectId(id) };
       const result = await productsCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    app.post("/order", verifyJWTToken, async (req, res) => {
+      const order = req.body;
+      const result = await ordersCollection.insertOne(order);
       res.send(result);
     });
   } finally {
