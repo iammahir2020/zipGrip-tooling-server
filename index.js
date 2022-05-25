@@ -195,6 +195,20 @@ async function run() {
       const result = await ordersCollection.insertOne(order);
       res.send(result);
     });
+
+    app.get("/order/:email", verifyJWTToken, async (req, res) => {
+      const email = req.params.email;
+      const query = { customerEmail: email };
+      const result = await ordersCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    app.delete("/order/:id", verifyJWTToken, async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await ordersCollection.deleteOne(query);
+      res.send(result);
+    });
   } finally {
   }
 }
