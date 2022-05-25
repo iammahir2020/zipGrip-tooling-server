@@ -39,6 +39,9 @@ async function run() {
     const reviewsCollection = client
       .db("zipGrip-tooling")
       .collection("reviews");
+    const productsCollection = client
+      .db("zipGrip-tooling")
+      .collection("products");
 
     app.get("/user", async (req, res) => {
       const users = await userCollection.find().toArray();
@@ -137,6 +140,12 @@ async function run() {
     app.post("/review", verifyJWTToken, async (req, res) => {
       const review = req.body;
       const result = await reviewsCollection.insertOne(review);
+      res.send(result);
+    });
+
+    app.post("/product", verifyJWTToken, async (req, res) => {
+      const product = req.body;
+      const result = await productsCollection.insertOne(product);
       res.send(result);
     });
   } finally {
