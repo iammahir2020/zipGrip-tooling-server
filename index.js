@@ -201,6 +201,11 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/order", verifyJWTToken, async (req, res) => {
+      const result = await ordersCollection.find().toArray();
+      res.send(result);
+    });
+
     app.get("/order/:email", verifyJWTToken, async (req, res) => {
       const email = req.params.email;
       const query = { customerEmail: email };
@@ -225,13 +230,23 @@ async function run() {
     app.patch("/order/:id", verifyJWTToken, async (req, res) => {
       const id = req.params.id;
       const payment = req.body;
+      console.log(payment.status);
       const filter = { _id: ObjectId(id) };
-      const updateDoc = {
-        $set: {
-          status: "Pending",
-          transactionId: payment.transactionId,
-        },
-      };
+      let updateDoc = {};
+      if (payment.status === "Paid") {
+        updateDoc = {
+          $set: {
+            status: "Pending",
+            transactionId: payment.transactionId,
+          },
+        };
+      } else {
+        updateDoc = {
+          $set: {
+            status: "Shipped",
+          },
+        };
+      }
       const result = await paymentsCollection.insertOne(payment);
       const updatedBooking = await ordersCollection.updateOne(
         filter,
