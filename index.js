@@ -11,7 +11,7 @@ const app = express();
 const corsConfig = {
   origin: "*",
   credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
 };
 app.use(cors(corsConfig));
 
@@ -66,6 +66,11 @@ async function run() {
     const paymentsCollection = client
       .db("zipGrip-tooling")
       .collection("payments");
+
+    app.get("/payment", async (req, res) => {
+      const payments = await paymentsCollection.find().toArray();
+      res.send(payments);
+    });
 
     app.get("/user", async (req, res) => {
       const users = await userCollection.find().toArray();
@@ -262,6 +267,7 @@ async function run() {
         updateDoc = {
           $set: {
             status: "Shipped",
+            transactionId: payment.transactionId,
           },
         };
       }
