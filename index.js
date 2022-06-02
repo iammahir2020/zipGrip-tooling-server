@@ -9,7 +9,7 @@ const port = process.env.PORT || 5000;
 const app = express();
 
 const corsConfig = {
-  origin: "https://zipgrip-tooling.web.app/",
+  origin: "https://zipgrip-tooling.web.app/*",
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
 };
