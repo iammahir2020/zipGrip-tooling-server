@@ -18,8 +18,8 @@ app.use(cors(corsConfig));
 app.options("*", cors(corsConfig));
 app.use(express.json());
 app.use(function (req, res, next) {
-  req.header("Access-Control-Allow-Origin", "*");
-  req.header(
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, Content-Type, Accept,authorization"
   );
