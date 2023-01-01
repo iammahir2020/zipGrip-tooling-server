@@ -1,5 +1,3 @@
-# Assignment 12
-
 ## ZipGrip Tooling
 
 Website Name: [ZipGrip Tooling](https://zipgrip-tooling.web.app/)
