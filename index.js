@@ -172,7 +172,7 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/product", verifyJWTToken, async (req, res) => {
+    app.get("/product", async (req, res) => {
       const result = await productsCollection.find().toArray();
       res.send(result);
     });
