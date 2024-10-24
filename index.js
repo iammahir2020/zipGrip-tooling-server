@@ -29,7 +29,7 @@ app.use(function (req, res, next) {
 // app.use(cors({ origin: "https://zipgrip-tooling.web.app/" }));
 // app.use(express.json());
 
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.fnswm.mongodb.net/?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.w3xg6gv.mongodb.net/retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
