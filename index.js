@@ -13,9 +13,9 @@ const corsConfig = {
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
 };
-app.use(cors());
+app.use(cors(corsConfig));
 
-app.options("*", cors());
+app.options("*", cors(corsConfig));
 app.use(express.json());
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
@@ -172,7 +172,7 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/product", async (req, res) => {
+    app.get("/product", verifyJWTToken, async (req, res) => {
       const result = await productsCollection.find().toArray();
       res.send(result);
     });
